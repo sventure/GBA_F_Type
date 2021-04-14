@@ -271,6 +271,8 @@ int main(void) {
 	int bulletx = 250, bullety = 250;
 
 	int bulletno = 26;
+
+	int c = 0;
 	// GBA docs are here:	https://mgba-emu.github.io/gbatek/
 
 	// game goes here
@@ -290,28 +292,41 @@ int main(void) {
 			BG1xScroll += 0.5f;
 			if (BG0xScroll > 255) { BG0xScroll = 0; }
 			if (BG1xScroll > 255) { BG1xScroll = 0; }
-		}
+			c++;
 
-		if (buttonspressed & BUTTON_A)
-		{
-			bullety = y;
-			bulletx = x;
-			bulletno++;
-			if (bulletno >= 31) { bulletno = 26; }
-		}
-
-		if (buttonsnotpressed & BUTTON_A)
-		{
+			
 			OAM[(bulletno * 4) + 0] = ((bullety + 10) << 0) | (0 << 14); //y coord, 14 = obj type
 			OAM[(bulletno * 4) + 1] = ((bulletx + 20) << 0) | (0 << 12) | (0 << 13) | (0 << 14);  //x coord, 12 = h flip, 13 = v flip, 14 = obj size
 			OAM[(bulletno * 4) + 2] = (16 << 0) | (2 << 12); // tile << 0 and pal << 12
-			bulletx += 5;
-
+			bulletx += 10;
+			
 			if (bulletx >= 250)
 			{
 				bulletx = 250;
 			}
 		}
+
+		if ((buttonspressed & BUTTON_A) && (c >= 40))
+		{
+			bullety = y;
+			bulletx = x;
+			bulletno++;
+			if (bulletno >= 31) { bulletno = 26; }
+			c = 0;
+		}
+
+		//if (buttonsnotpressed & BUTTON_A)
+		//{
+		//	OAM[(bulletno * 4) + 0] = ((bullety + 10) << 0) | (0 << 14); //y coord, 14 = obj type
+		//	OAM[(bulletno * 4) + 1] = ((bulletx + 20) << 0) | (0 << 12) | (0 << 13) | (0 << 14);  //x coord, 12 = h flip, 13 = v flip, 14 = obj size
+		//	OAM[(bulletno * 4) + 2] = (16 << 0) | (2 << 12); // tile << 0 and pal << 12
+		//	bulletx += 5;
+
+		//	if (bulletx >= 250)
+		//	{
+		//		bulletx = 250;
+		//	}
+		//}
 
 		if (buttonspressed & DPAD_DOWN)         // y-axis is flipped
 		{
