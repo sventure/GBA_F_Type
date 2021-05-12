@@ -330,17 +330,17 @@ int main(void) {
 
 		if (buttonspressed & DPAD_DOWN)         // y-axis is flipped
 		{
-			y++;
-			if (y > 150)
+			y += 2;
+			if (y > 140)
 			{ 
-				y = 150;
+				y = 140;
 			}
 			OAM[(25 * 4) + 0] = (y << 0) | (1 << 14);
 		}
 
 		if (buttonspressed & DPAD_UP)          // y-axis is flipped
 		{
-			y--;
+			y -= 2;
 			if (y < 0)
 			{
 				y = 0;
@@ -350,17 +350,17 @@ int main(void) {
 
 		if (buttonspressed & DPAD_RIGHT)
 		{
-			x++;
-			if (x > 230)
+			x += 2;
+			if (x > 140)
 			{
-				x = 230;
+				x = 140;
 			}
 			OAM[(25 * 4) + 1] = (x << 0) | (0 << 12) | (0 << 13) | (2 << 14);
 		}
 
 		if (buttonspressed & DPAD_LEFT)
 		{
-			x--;
+			x -= 2;
 			if (x < 0)
 			{
 				x = 0;
