@@ -21,15 +21,11 @@ typedef unsigned short uint16;
 #define DPAD_LEFT	(1 << 5)  //bit 5 = left
 #define DPAD_RIGHT	(1 << 4)  //bit 4 = right
 
-extern void someFunction(int* x, int* y, int* z);
+extern void someFunction(int *x);
 extern const unsigned int charData[];
 extern const unsigned int charData2[];
 
 int main(void) {
-
-	int location = 65;
-	int place = 5;
-	int finalplace = 0;
 	
 	// required to enable vBlank interrupts (i will explain in the lesson)
 	irqInit();
@@ -83,14 +79,18 @@ int main(void) {
 	BGPALETTE[(2 * 16) + 1] = (31 << 0) | (31 << 5) | (0 << 10);
 	BGPALETTE[(2 * 16) + 2] = (31 << 0) | (15 << 5) | (0 << 10);
 
+	BGPALETTE[(3 * 16) + 1] = (0 << 0) | (0 << 5) | (15 << 10);
+	BGPALETTE[(3 * 16) + 2] = (31 << 0) | (0 << 5) | (31 << 10);
+
 	for (int i = 0; i <= 2048; i++)
 	{
 		BGTILES[i] = charData[i];
 	}
-
+	
 	for (int i = 0; i <= 7; i++)
 	{
 		BGTILES[(16 * 8) + i] = charData2[(16 * 8) + i];       //le bullet from chardata2
+		BGTILES[(17 * 8) + i] = charData2[(17 * 8) + i];       //enemy from chardata2
 	}
 
 	for (i = 0; i <= 256; i++)
@@ -171,9 +171,9 @@ int main(void) {
 	//tile 12, pal 7
 	//(tile << 0) | (pal << 12)
 
-	someFunction(&location, &place, &finalplace);
+	//someFunction(&location, &place, &finalplace);
 
-	MAPMEM[finalplace] = (12 << 0) | (7 << 12);
+	//MAPMEM[finalplace] = (12 << 0) | (7 << 12);
 	//MAPMEM[1024 + 101] = (12 << 0) | (7 << 12);
 
 	for (i = 0; i <= 1024; i++)                                                               // for the stars
@@ -266,13 +266,15 @@ int main(void) {
 	int BG0xScroll = 0;
 
 	uint16* BG1SCROLLX = (uint16*)0x4000014;
-	float BG1xScroll = 0;
+	int BG1xScroll = 0;
 
 	int bulletx = 250, bullety = 250;
 
 	int bulletno = 26;
 
-	int c = 0;
+	int frames = 0;
+
+	int bulletpal = 2;
 	// GBA docs are here:	https://mgba-emu.github.io/gbatek/
 
 	// game goes here
@@ -286,33 +288,35 @@ int main(void) {
 
 		if (true)
 		{
+			frames++;
+
 			BG0SCROLLX[0] = BG0xScroll;
 			BG1SCROLLX[0] = BG1xScroll;
 			BG0xScroll++;
-			BG1xScroll += 0.5f;
+			if (frames % 3 == 0)
+			{
+				BG1xScroll++;
+			}
 			if (BG0xScroll > 255) { BG0xScroll = 0; }
 			if (BG1xScroll > 255) { BG1xScroll = 0; }
-			c++;
-
 			
+			someFunction(&bulletx);
 			OAM[(bulletno * 4) + 0] = ((bullety + 10) << 0) | (0 << 14); //y coord, 14 = obj type
 			OAM[(bulletno * 4) + 1] = ((bulletx + 20) << 0) | (0 << 12) | (0 << 13) | (0 << 14);  //x coord, 12 = h flip, 13 = v flip, 14 = obj size
-			OAM[(bulletno * 4) + 2] = (16 << 0) | (2 << 12); // tile << 0 and pal << 12
-			bulletx += 10;
-			
+			OAM[(bulletno * 4) + 2] = (16 << 0) | (bulletpal << 12); // tile << 0 and pal << 12
+			//bulletx += 10;
 			if (bulletx >= 250)
 			{
 				bulletx = 250;
 			}
 		}
 
-		if ((buttonspressed & BUTTON_A) && (c >= 40))
+		if ((buttonspressed & BUTTON_A) && (frames % 40 == 0))
 		{
 			bullety = y;
 			bulletx = x;
 			bulletno++;
 			if (bulletno >= 31) { bulletno = 26; }
-			c = 0;
 		}
 
 		//if (buttonsnotpressed & BUTTON_A)
@@ -327,6 +331,16 @@ int main(void) {
 		//		bulletx = 250;
 		//	}
 		//}
+
+		if (buttonspressed & BUTTON_L)
+		{
+			bulletpal = 3;
+		}
+
+		if (buttonspressed & BUTTON_R)
+		{
+			bulletpal = 2;
+		}
 
 		if (buttonspressed & DPAD_DOWN)         // y-axis is flipped
 		{

@@ -16,12 +16,11 @@ push { r4-r7, lr }	@ push r4-r7 and link register onto stack. Your function migh
 	@ YOUR ASSEMBLY CODE GOES HERE
 	@ r0-r3 will automatically contain any parameters sent when calling the function (any more are pushed to stack for you).
 	
-	ldr r4, [r0]		@location
-	ldr r5, [r1]		@place
+	ldr r4, [r0]		@bullet x
 	
-	add r6, r5, r4		@r6 = r5 + r4
+	add r4, #10	    @r6 = r5 + r4
 	
-	str r6, [r2]		@r2 = r6 value finalplace
+	str r4, [r0]		@r0 = r6 value increment
 
 pop { r4-r7 }		@ pop first 4 values from stack back into r4-r7, and also
 pop { r3 }			@ pop the next value from stack (stored value for lr) into some unused register, e.g. r3 -
