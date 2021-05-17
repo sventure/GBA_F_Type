@@ -275,6 +275,18 @@ int main(void) {
 	int frames = 0;
 
 	int bulletpal = 2;
+
+	int enemy1X = 240;
+	int enemy1Y = 70;
+
+	int enemy2X = 275;
+	int enemy2Y = 55;
+
+	int enemy1Tile = 17;
+	int enemy2Tile = 17;
+
+	int enemy1pal = 2;
+	int enemy2pal = 3;
 	// GBA docs are here:	https://mgba-emu.github.io/gbatek/
 
 	// game goes here
@@ -304,10 +316,34 @@ int main(void) {
 			OAM[(bulletno * 4) + 0] = ((bullety + 10) << 0) | (0 << 14); //y coord, 14 = obj type
 			OAM[(bulletno * 4) + 1] = ((bulletx + 20) << 0) | (0 << 12) | (0 << 13) | (0 << 14);  //x coord, 12 = h flip, 13 = v flip, 14 = obj size
 			OAM[(bulletno * 4) + 2] = (16 << 0) | (bulletpal << 12); // tile << 0 and pal << 12
-			//bulletx += 10;
+
+			OAM[(35 * 4) + 0] = (enemy1Y << 0) | (0 << 14); //y coord, 14 = obj type
+			OAM[(35 * 4) + 1] = (enemy1X << 0) | (0 << 12) | (0 << 13) | (0 << 14);  //x coord, 12 = h flip, 13 = v flip, 14 = obj size
+			OAM[(35 * 4) + 2] = (enemy1Tile << 0) | (enemy1pal << 12); // tile << 0 and pal << 12
+
+			OAM[(36 * 4) + 0] = (enemy2Y << 0) | (0 << 14); //y coord, 14 = obj type
+			OAM[(36 * 4) + 1] = (enemy2X << 0) | (0 << 12) | (0 << 13) | (0 << 14);  //x coord, 12 = h flip, 13 = v flip, 14 = obj size
+			OAM[(36 * 4) + 2] = (enemy2Tile << 0) | (enemy2pal << 12); // tile << 0 and pal << 12
+
 			if (bulletx >= 250)
 			{
 				bulletx = 250;
+			}
+
+			if ((bullety >= (enemy1Y - 5)) && (bullety <= (enemy1Y + 5)) && (bulletx >= (enemy1X - 20)) && (bulletx <= (enemy1X + 20)) && (bulletpal == enemy1pal))
+			{
+				enemy1Tile = 0;
+			}
+
+			if ((bullety >= (enemy2Y - 5)) && (bullety <= (enemy2Y + 5)) && (bulletx >= (enemy2X - 20)) && (bulletx <= (enemy2X + 20)) && (bulletpal == enemy2pal))
+			{
+				enemy2Tile = 0;
+			}
+
+			if (frames % 5 == 0)
+			{
+				enemy1X--;
+				enemy2X--;
 			}
 		}
 
