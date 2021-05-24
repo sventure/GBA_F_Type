@@ -25,6 +25,11 @@ extern void someFunction(int *x);
 extern const unsigned int charData[];
 extern const unsigned int charData2[];
 
+enum Notes { note_a = 1750, note_A = 1767, note_b = 1783, note_c = 1797, note_C = 1812, note_d = 1823, note_D = 1837, note_e = 1849, note_f = 1860, note_F = 1871, note_g = 1880, note_G = 1890};
+
+uint16 song[32] = { note_b, note_b, note_F, note_b, note_d, note_b, note_A, note_A, note_A, note_F, note_g, note_F, note_e, note_d, note_C, note_b,               //16 notes
+					note_A, note_b, note_b, note_b, note_F, note_b, note_d, note_b, note_A, note_b, note_d, note_g, note_F, note_A, note_b,      0};                   //32 notes
+
 int main(void) {
 	
 	// required to enable vBlank interrupts (i will explain in the lesson)
@@ -268,6 +273,35 @@ int main(void) {
 	uint16* BG1SCROLLX = (uint16*)0x4000014;
 	int BG1xScroll = 0;
 
+	uint16* SOUND_MASTER = (uint16*)0x4000084;
+	SOUND_MASTER[0] = (1 << 7); //turns on sound and enables access to all sound registers
+	
+	uint16* SOUND_MIX = (uint16*)0x4000082;
+	SOUND_MIX[0] = (2 << 0); //Sound channels = 100%, DMA = 0%
+
+	uint16* SOUND_VOLUMES = (uint16*)0x4000080;
+	SOUND_VOLUMES[0] = (7 << 0) | (7 << 4) | (1 << 9) | (1 << 13);
+	// right_vol << 0 | left_vol << 4 | sound2_playright << 9 | sound2_playleft << 13
+
+	//uint16* SOUND1_SWEEP = (uint16*)0x4000060;   //TONE & SWEEP
+	//SOUND1_SWEEP[0] = (5 << 0) | (0 << 3) | (0 << 4);
+
+	//uint16* SOUND1_DUTYANDENV = (uint16*)0x4000062;
+	//SOUND1_DUTYANDENV[0] = (0 << 0) | (2 << 6) | (0 << 8) | (15 << 12);
+
+	//uint16* SOUND1_FREQ = (uint16*)0x4000064;
+	//SOUND1_FREQ[0] = (856 << 0) | (1 << 14) | (1 << 15);
+
+	uint16* SOUND2_SETTINGS = (uint16*)0x4000068;   //TONE
+	// length << 0 | duty << 6 | env_speed << 8 | start_vol << 12
+	SOUND2_SETTINGS[0] = (0 << 0) | (2 << 6) | (0 << 8) | (7 << 12);
+	// length 0 = 0.25s, duty = 2 (normal), env off, vol 7
+
+	uint16* SOUND2_FREQ = (uint16*)0x400006C;
+	// freq << 0 | use_length << 14 | reset << 15 
+	//SOUND2_FREQ[0] = (1750 << 0) | (1 << 14) | (1 << 15);
+	// freq here = 2048 - (2 ^ 17 / freq val)
+
 	int bulletx = 250, bullety = 250;
 
 	int bulletno = 26;
@@ -287,6 +321,10 @@ int main(void) {
 
 	int enemy1pal = 2;
 	int enemy2pal = 3;
+
+	uint16 songspeed = 12;
+	uint16 curNote = 0;
+	uint16 curFrame = 0;
 	// GBA docs are here:	https://mgba-emu.github.io/gbatek/
 
 	// game goes here
@@ -298,8 +336,20 @@ int main(void) {
 
 		uint16 buttonspressed = ~(buttonsnotpressed);
 
-		if (true)
+		if (curFrame == 0)
 		{
+			uint16 theNote = song[curNote];
+			if (theNote > 0)
+			{
+				SOUND2_FREQ[0] = (theNote << 0) | (1 << 14) | (1 << 15);
+			}
+			curNote++;
+			curNote %= 32;
+		}
+
+		curFrame++;
+		curFrame %= songspeed;
+
 			frames++;
 
 			BG0SCROLLX[0] = BG0xScroll;
@@ -345,7 +395,6 @@ int main(void) {
 				enemy1X--;
 				enemy2X--;
 			}
-		}
 
 		if ((buttonspressed & BUTTON_A) && (frames % 40 == 0))
 		{
@@ -353,6 +402,11 @@ int main(void) {
 			bulletx = x;
 			bulletno++;
 			if (bulletno >= 31) { bulletno = 26; }
+
+			// freq << 0 | use_length << 14 | reset << 15 
+			SOUND2_FREQ[0] = (856 << 0) | (1 << 14) | (1 << 15);
+			// freq here = 2048 - (2 ^ 17 / freq val)
+
 		}
 
 		//if (buttonsnotpressed & BUTTON_A)
