@@ -268,10 +268,10 @@ int main(void) {
 	BG1[0] = (9 << 8) | (0 << 2) | (1 << 0);
 
 	uint16* BG0SCROLLX = (uint16*)0x4000010;
-	int BG0xScroll = 0;
+	uint16 BG0xScroll = 0;
 
 	uint16* BG1SCROLLX = (uint16*)0x4000014;
-	int BG1xScroll = 0;
+	uint16 BG1xScroll = 0;
 
 	uint16* SOUND_MASTER = (uint16*)0x4000084;
 	SOUND_MASTER[0] = (1 << 7); //turns on sound and enables access to all sound registers
@@ -302,25 +302,25 @@ int main(void) {
 	//SOUND2_FREQ[0] = (1750 << 0) | (1 << 14) | (1 << 15);
 	// freq here = 2048 - (2 ^ 17 / freq val)
 
-	int bulletx = 250, bullety = 250;
+	uint16 bulletx = 250, bullety = 250;
 
-	int bulletno = 26;
+	uint16 bulletno = 26;
 
-	int frames = 0;
+	uint16 frames = 0;
 
-	int bulletpal = 2;
+	uint16 bulletpal = 2;
 
-	int enemy1X = 240;
-	int enemy1Y = 70;
+	uint16 enemy1X = 240;
+	uint16 enemy1Y = 70;
 
-	int enemy2X = 275;
-	int enemy2Y = 55;
+	uint16 enemy2X = 275;
+	uint16 enemy2Y = 55;
 
-	int enemy1Tile = 17;
-	int enemy2Tile = 17;
+	uint16 enemy1Tile = 17;
+	uint16 enemy2Tile = 17;
 
-	int enemy1pal = 2;
-	int enemy2pal = 3;
+	uint16 enemy1pal = 2;
+	uint16 enemy2pal = 3;
 
 	uint16 songspeed = 12;
 	uint16 curNote = 0;
